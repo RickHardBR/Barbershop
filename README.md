@@ -2,8 +2,8 @@
 - [x] Setup do banco
 - [x] Seeding do banco (colocar dados)
 - [x] Introdução ao Next.js
-- [ ] Tailwind e Shadcn
-- [ ] Git Hooks
+- [x] Tailwind e Shadcn
+- [x] Git Hooks
 
 This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
