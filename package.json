@@ -7,7 +7,7 @@
     "start": "next start",
     "lint": "next lint",
     "prepare": "husky",
-    "dev": "next dev -H 192.168.0.252"
+    "dev": "next dev"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
