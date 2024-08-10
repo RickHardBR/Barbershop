@@ -24,81 +24,102 @@
 
 ## Acessar Aplicação pelo Celular
 
-Acessar a aplicação pelo celular, quem quiser tentar fica assim. Primeiro você descobre qual seu IP da rede, tem duas formas:
+  * Algumas funcionalidades que usamos durante a programação podem não funcionar corretamente por não usarmos um servidor **https://**, por tanto segue abaixo uma forma de gerar um servidor https://seuip:3000 para poder acessar pelo celular ou no próprio computador.
 
-01)	- Clicando com o botão direito do mouse no ícone de rede na barra de Tarefas: 
- 
-02)	- Depois clique sobre o ícone de engrenagem ou no texto mesmo Configuração da rede e da internet.
+  🤓 É possível configurar o Next.js para rodar com HTTPS em um endereço personalizado como https://seuip:3000 durante o desenvolvimento local.
+  
+  🙌 Para isso, você precisa configurar um servidor de desenvolvimento local com suporte a HTTPS. Aqui está um guia passo a passo:
 
-03)	- Se você usa cabo clique em Ethernet, se usa Wi-fi clica em Wi-fi.
+1. Gerar Certificados SSL (Localmente)
+Para rodar um servidor HTTPS localmente, você precisará de um certificado SSL e uma chave privada. Isso pode ser feito usando openssl ou outras ferramentas.
 
-04)	-  Eu uso cabo então: Pego o valor do IP, no meu caso é: 192.168.0.252. 
+Usando OpenSSL:
+No terminal, execute os seguintes comandos:
 
-Outra forma de descobrir seu IP é pelo CMD, clique em pesquisar no windows e digite cmd, Vai aparecer o comando, clique sobre ele e vai abrir a tela do Prompt de Comando,
-Digite: Ipconfig
+```
+openssl genrsa -out key.pem 2048
+openssl req -new -key key.pem -out csr.pem
+openssl x509 -req -days 365 -in csr.pem -signkey key.pem -out cert.pem
+```
+Isso irá gerar dois arquivos: **key.pem** (chave privada) e **cert.pem** (certificado).
 
-Vai aparecer algo assim:
+2. Configurar o Next.js com HTTPS
+   
+* Depois de gerar os certificados, você precisa configurar o Next.js para usar HTTPS durante desenvolvimento.
 
-    Configuração de IP do Windows
+👣 Passos:
+   
+  * Criar um arquivo de configuração do servidor personalizado:
 
-    Adaptador Ethernet Ethernet:
+  * Crie um arquivo **server.js** na raiz do seu projeto:
 
-    Sufixo DNS específico de conexão. . . . . . :
+```js
+const { createServer } = require('https');
+const { parse } = require('url');
+const next = require('next');
+const fs = require('fs');
+const path = require('path');
 
-     Endereço IPv6 de link local . . . . . . . . : er14::9e55:41cc:1478:3254%6
+const dev = process.env.NODE_ENV !== 'production';
+const app = next({ dev });
+const handle = app.getRequestHandler();
 
-    Endereço IPv4. . . . . . . .  . . . . . . . : 192.168.0.252
+const httpsOptions = {
+  key: fs.readFileSync(path.join(__dirname, 'key.pem')),
+  cert: fs.readFileSync(path.join(__dirname, 'cert.pem')),
+};
 
-     Máscara de Sub-rede . . . . . . . . . . . . : 255.255.255.0
+app.prepare().then(() => {
+  createServer(httpsOptions, (req, res) => {
+    const parsedUrl = parse(req.url, true);
+    handle(req, res, parsedUrl);
+  }).listen(3000, '0.0.0.0', (err) => {
+    if (err) throw err;
+    console.log('> Server started on https://meuip:3000');
+  });
+});
 
-    Gateway Padrão. . . . . . . . . . . . . . . : 192.168.0.1
+```
+Substitua "meuip" pelo endereço IP da sua máquina, por exemplo, 192.168.1.10.
 
-Você vai precisar apenas do número que aparece em Endereço de IPv4.
+3. Modificar **package.json** para usar o servidor customizado:
 
-05)	- Agora com a posse desse IP vc entra no seu arquivo PACKAGE.JSON,
+No arquivo **package.json**, modifique o script de desenvolvimento para usar o server.js:
+```js
+"scripts": {
+  "dev": "node server.js",
+  "build": "next build",
+  "start": "next start"
+}
 
- 
-06)	- ache "scrips": e ache a opção "dev".
- 
-vai estar assim:
+```
+4. Executar o Servidor
+Agora, quando você rodar npm run dev, o servidor Next.js será executado com HTTPS no endereço especificado:
+```js
+npm run dev
+```
 
-<dl>
-    <dd>"scripts": {</dd>
-    <dd>"buid": "next build",</dd>
-    <dd>"start": "next start",</dd>
-    <dd>"lint": "next lint",</dd>
-    <dd>"prepare": "husky",</dd>
-    <dd>"dev": "next dev",</dd>
-    <dd>}, 
-</dl>
+A aplicação estará acessível em https://meuip:3000.
 
-07)	- Apenas coloque assim:
+exemplo:
+* supondo que meu IP é 192.168.0.252
+* o endereço para acessar ficará assim: https://192.168.0.252:3000/
 
-<dl>
-    <dd>"scripts": {</dd>
-    <dd>"buid": "next build",</dd>
-    <dd>"start": "next start",</dd>
-    <dd>"lint": "next lint",</dd>
-    <dd>"prepare": "husky",</dd>
-    <dd>"dev": "next dev -H 192.168.0.252",</dd>
-    <dd>}, 
-</dl>
+#
 
+5. Possíveis Ajustes e Considerações
+   
+* Aviso de Segurança: Como os certificados criados com OpenSSL não são emitidos por uma autoridade confiável, o navegador exibirá um aviso de segurança. Você pode ignorar o aviso para fins de desenvolvimento.
 
-    no lugar do meu IP coloque o seu.
+* Permissões de Rede: Certifique-se de que a porta 3000 esteja aberta no seu firewall ou roteador se você estiver tentando acessar o servidor de outra máquina na mesma rede.
 
-08)	- Rode o npm run dev, ele ira criar o servidor:
+* Nome do Domínio: Se você quiser usar um nome de domínio (como meudominio.local) em vez de um IP, você pode modificar o arquivo /etc/hosts para mapear o domínio ao seu IP local.
 
-<dl>
-    <dd>-Local: http://192.168.0.252:3000/</dd>
-    <dd>-Network: http://192.168.0.252:3000/</dd>
-</dl>
+#
 
-Para acessar pelo celular basta abrir o navegador do celular e digitar
+Seguindo esses passos, você terá um ambiente de desenvolvimento local com suporte a HTTPS usando Next.js.
 
-http://192.168.0.252:3000/ 
-
-E pronto você terá acesso a sua aplicação pelo celular. Qualquer dúvida, só me chamar...
+Qualquer dúvida, só me chamar...
 
 #
 

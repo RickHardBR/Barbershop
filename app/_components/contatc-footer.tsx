@@ -1,32 +1,31 @@
+"use client"
+
 import { Smartphone } from "lucide-react"
 import { Button } from "./ui/button"
+import { toast } from "sonner"
 
-const ContactFooter = () => {
+interface ContactFooterProps {
+  phone: string
+}
+const ContactFooter = ({ phone }: ContactFooterProps) => {
+  const handleCopyPhoneClick = (phone: string) => {
+    navigator.clipboard.writeText(phone)
+    toast.success(`número ${phone} copiado`)
+  }
+
   return (
-    <div className="border-t border-solid p-5">
-      <h3 className="mb-3">Contato</h3>
-      <div className="space-y-4">
-        <div className="ml-4 mr-4 flex items-center justify-between">
-          <Smartphone />
-          <h3>(11) 99999-9999</h3>
-          <Button
-            variant="secondary"
-            className="h-[36px] w-[90px] rounded-[10px]"
-          >
-            Copiar
-          </Button>
-        </div>
-        <div className="ml-4 mr-4 flex items-center justify-between">
-          <Smartphone />
-          <h3>(11) 99999-9999</h3>
-          <Button
-            variant="secondary"
-            className="h-[36px] w-[90px] rounded-[10px]"
-          >
-            Copiar
-          </Button>
-        </div>
+    <div className="flex justify-between gap-2" key={phone}>
+      <div className="flex items-center gap-2">
+        <Smartphone />
+        <p className="text-sm">{phone}</p>
       </div>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => handleCopyPhoneClick(phone)}
+      >
+        Copiar
+      </Button>
     </div>
   )
 }

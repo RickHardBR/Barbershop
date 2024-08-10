@@ -1,5 +1,4 @@
 import ContactFooter from "@/app/_components/contatc-footer"
-import Footer from "@/app/_components/footer"
 import ServiceItem from "@/app/_components/service-item"
 import { Button } from "@/app/_components/ui/button"
 import { db } from "@/app/_lib/prisma"
@@ -76,7 +75,8 @@ const BarbershopPage = async ({ params }: BarbershopPageProps) => {
           {barbershop?.description}
         </p>
       </div>
-      <div className="space-y-3 p-5">
+      {/* SERVIÇOS */}
+      <div className="space-y-3 border-b border-solid p-5">
         <h2 className="text-sm font-bold uppercase text-gray-400">Serviços</h2>
         <div className="space-y-3">
           {barbershop.services.map((service) => (
@@ -84,8 +84,14 @@ const BarbershopPage = async ({ params }: BarbershopPageProps) => {
           ))}
         </div>
       </div>
-      <ContactFooter />
-      <Footer />
+
+      {/* CONTATO */}
+      <div className="space-y-3 border-t border-solid p-5">
+        <h3 className="mb-4">Contato</h3>
+        {barbershop.phones.map((phone) => (
+          <ContactFooter key={phone} phone={phone} />
+        ))}
+      </div>
     </div>
   )
 }
