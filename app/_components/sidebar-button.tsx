@@ -10,7 +10,7 @@ import {
   SheetTrigger,
 } from "./ui/sheet"
 import { quickSearchOptions } from "../_constants/search"
-import { Avatar, AvatarImage } from "@radix-ui/react-avatar"
+import { Avatar, AvatarImage } from "./ui/avatar"
 import Link from "next/link"
 
 const SidebarButton = () => {
