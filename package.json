@@ -7,7 +7,7 @@
     "start": "next start",
     "lint": "next lint",
     "prepare": "husky",
-    "dev": "node server.js"
+    "dev": "next dev"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"

@@ -4,6 +4,7 @@ import "./globals.css"
 import { Nunito } from "next/font/google"
 import { Toaster } from "sonner"
 import Footer from "./_components/footer"
+import AuthProvider from "./_providers/auth"
 
 const nunito = Nunito({
   weight: ["400", "700"], // Adapte conforme necessário
@@ -25,9 +26,11 @@ export default function RootLayout({
   return (
     <html lang="pt-br" className="dark">
       <body className={`${inter.className} ${nunito.className}`}>
-        {children}
-        <Toaster />
-        <Footer />
+        <AuthProvider>
+          {children}
+          <Toaster />
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   )
