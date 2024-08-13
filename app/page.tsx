@@ -6,22 +6,43 @@ import { db } from "./_lib/prisma"
 import { quickSearchOptions } from "./_constants/search"
 import BookingItem from "./_components/booking-itens"
 import Search from "./_components/search"
+import { getServerSession } from "next-auth/next"
+import { authOptions } from "./api/auth/[...nextauth]/route"
+import Link from "next/link"
 
-const Home = async () => {
+const formatDate = (date: Date) => {
+  const options: Intl.DateTimeFormatOptions = {
+    weekday: "long",
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  }
+  return new Intl.DateTimeFormat("pt-BR", options).format(date)
+}
+export default async function Home() {
+  // Obtendo a sessão do usuário
+  const session = await getServerSession(authOptions)
+
+  // Obtendo dados da barbearia
   const barbershops = await db.barbershop.findMany({})
   const PopularBarbershops = await db.barbershop.findMany({
     orderBy: {
       name: "desc",
     },
   })
+  // Obtenha a data atual
+  const today = new Date()
+  const formattedDate = formatDate(today)
   return (
     <div>
       {/*header*/}
       <Header />
 
       <div className="p-5">
-        <h2 className="text-xl font-bold">Olá, Ricardo</h2>
-        <p>Segunda-feira, 08 de agosto</p>
+        <h2 className="text-xl font-bold">
+          Olá, {session?.user?.name ?? "Visitante"}
+        </h2>
+        <p>{formattedDate}</p>
         <div className="mt-6">
           <Search />
         </div>
@@ -29,16 +50,23 @@ const Home = async () => {
         {/* BUSCA RAPIDA */}
         <div className="item-center mt-6 flex gap-3 overflow-auto [&::-webkit-scrollbar]:hidden">
           {quickSearchOptions.map((option) => (
-            <Button variant={"secondary"} className="gap-2" key={option.title}>
-              <Image
-                src={option.imageUrl}
-                width={16}
-                height={16}
-                alt={option.title}
-              />
-              <p className="text-xs font-bold uppercase text-gray-400">
-                {option.title}
-              </p>
+            <Button
+              variant={"secondary"}
+              className="gap-2"
+              key={option.title}
+              asChild
+            >
+              <Link href={`/barbershops?service=${option.title}`}>
+                <Image
+                  src={option.imageUrl}
+                  width={16}
+                  height={16}
+                  alt={option.title}
+                />
+                <p className="text-xs font-bold uppercase text-gray-400">
+                  {option.title}
+                </p>
+              </Link>
             </Button>
           ))}
         </div>
@@ -82,5 +110,3 @@ const Home = async () => {
     </div>
   )
 }
-
-export default Home
